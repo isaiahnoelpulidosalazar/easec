@@ -1,0 +1,26 @@
+import "datetime.modec" as dt
+
+say "--- easec datetime demo ---"
+
+var current_date dt.get_today_date
+var current_time dt.get_today_time
+var current_iso dt.get_today_iso
+
+say "Today's Date:"
+say current_date
+
+say "Today's Time (UTC):"
+say current_time
+
+say "Full ISO timestamp:"
+say current_iso
+say ""
+
+say "Sleeping for 1.5 seconds..."
+var t1 time get
+time sleep 1500
+var t2 time get
+
+var diff t2 - t1
+say "Elapsed time (ms):"
+say diff

@@ -1,0 +1,175 @@
+note [
+    easec datetime module (UTC)
+]
+
+note Pad number with leading zero if single digits
+job pad val [
+    if val < 10 [
+        out "0" + val
+    ]
+    out "" + val
+]
+
+note Convert Epoch milliseconds to UTC components
+job get_utc_dict epoch_ms [
+    var total_seconds epoch_ms / 1000
+    var second total_seconds % 60
+    
+    var total_minutes total_seconds / 60
+    var minute total_minutes % 60
+    
+    var total_hours total_minutes / 60
+    var hour total_hours % 24
+    
+    var days total_hours / 24
+    
+    var year 1970
+    
+    note Loop to subtract years until we find the correct year
+    repeat forever [
+        var leap 0
+        if (year % 4) == 0 [
+            if (year % 100) == 0 [
+                if (year % 400) == 0 [
+                    leap = 1
+                ] else [
+                    leap = 0
+                ]
+            ] else [
+                leap = 1
+            ]
+        ]
+        
+        var days_in_year 365
+        if leap == 1 [
+            days_in_year = 366
+        ]
+        
+        if days >= days_in_year [
+            days = days - days_in_year
+            year = year + 1
+        ] else [
+            note Year found. Now calculate month and day.
+            var month 1
+            
+            note Jan
+            if days >= 31 [
+                days = days - 31
+                month = 2
+                
+                note Feb
+                var feb_days 28
+                if leap == 1 [
+                    feb_days = 29
+                ]
+                if days >= feb_days [
+                    days = days - feb_days
+                    month = 3
+                    
+                    note Mar
+                    if days >= 31 [
+                        days = days - 31
+                        month = 4
+                        
+                        note Apr
+                        if days >= 30 [
+                            days = days - 30
+                            month = 5
+                            
+                            note May
+                            if days >= 31 [
+                                days = days - 31
+                                month = 6
+                                
+                                note Jun
+                                if days >= 30 [
+                                    days = days - 30
+                                    month = 7
+                                    
+                                    note Jul
+                                    if days >= 31 [
+                                        days = days - 31
+                                        month = 8
+                                        
+                                        note Aug
+                                        if days >= 31 [
+                                            days = days - 31
+                                            month = 9
+                                            
+                                            note Sep
+                                            if days >= 30 [
+                                                days = days - 30
+                                                month = 10
+                                                
+                                                note Oct
+                                                if days >= 31 [
+                                                    days = days - 31
+                                                    month = 11
+                                                    
+                                                    note Nov
+                                                    if days >= 30 [
+                                                        days = days - 30
+                                                        month = 12
+                                                    ]
+                                                ]
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+            
+            var day days + 1
+            dictionary result year: year, month: month, day: day, hour: hour, minute: minute, second: second
+            out result
+        ]
+    ]
+]
+
+note Return UTC date string as YYYY-MM-DD
+job get_date_string epoch_ms [
+    var dt get_utc_dict epoch_ms
+    var y dictionary get dt year
+    var m pad (dictionary get dt month)
+    var d pad (dictionary get dt day)
+    out y + "-" + m + "-" + d
+]
+
+note Return UTC time string as HH:MM:SS
+job get_time_string epoch_ms [
+    var dt get_utc_dict epoch_ms
+    var h pad (dictionary get dt hour)
+    var min pad (dictionary get dt minute)
+    var s pad (dictionary get dt second)
+    out h + ":" + min + ":" + s
+]
+
+note Return ISO 8601 datetime string (YYYY-MM-DD HH:MM:SS)
+job get_iso_string epoch_ms [
+    var dt get_utc_dict epoch_ms
+    var y dictionary get dt year
+    var m pad (dictionary get dt month)
+    var d pad (dictionary get dt day)
+    var h pad (dictionary get dt hour)
+    var min pad (dictionary get dt minute)
+    var s pad (dictionary get dt second)
+    out y + "-" + m + "-" + d + " " + h + ":" + min + ":" + s
+]
+
+job get_today_date [
+    var now time get
+    out get_date_string now
+]
+
+job get_today_time [
+    var now time get
+    out get_time_string now
+]
+
+job get_today_iso [
+    var now time get
+    out get_iso_string now
+]

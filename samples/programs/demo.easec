@@ -1,0 +1,101 @@
+note [
+    easec demo
+]
+
+var start_time time get
+
+say "--- easec demo ---"
+say ""
+
+say "> 1. Variables"
+var text greeting "Hello, World!"
+var number x 10
+var number y 20
+var result x + y
+
+say greeting
+say "10 + 20 = "
+say result
+say ""
+
+say "> 2. Arrays"
+array text proglang "C", "C++", "Assembly"
+say "Initial Array Index 1:"
+say array get proglang 1
+
+array set proglang 1 "EaseC"
+say "Modified Array Index 1:"
+say array get proglang 1
+say ""
+
+
+say "> 3. Dictionaries"
+dictionary information name: "John", age: 15
+
+say "Dictionary User Name:"
+say dictionary get information name
+
+say "Original Age:"
+say dictionary get information age
+
+dictionary set information age 21
+say "Updated Age:"
+say dictionary get information age
+say ""
+
+
+say "> 4. Jobs (Functions)"
+job multiplyNumbers a, b [
+    var product a * b
+    out product
+]
+
+var math_result multiplyNumbers 5, 8
+say "5 * 8 via Job is:"
+say math_result
+say ""
+
+say "> 5. Conditionals"
+if math_result == 40 [
+    say "The math job worked correctly!"
+] else [
+    say "Something went wrong..."
+]
+
+if false [
+    say "This will not print."
+] else [
+    say "The else block works!"
+]
+say ""
+
+say "> 6. Loops"
+var counter 3
+say "Counting down:"
+repeat 3 [
+    say counter
+    counter = counter - 1
+]
+say "Blastoff!"
+say ""
+
+say "> 7. File Operations"
+var filename "easec_test_file.txt"
+
+say "Creating file..."
+file create filename "This is a test file created by EaseC.\n"
+
+say "Appending to file..."
+file update filename "This is the second line added.\n"
+
+say "File operations complete. Deleting file..."
+file delete filename
+say "File deleted."
+say ""
+
+say "> 8. Time Command"
+var end_time time get
+var elapsed end_time - start_time
+
+say "Total execution time (ms):"
+say elapsed

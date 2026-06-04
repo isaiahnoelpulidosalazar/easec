@@ -1,0 +1,26 @@
+var decimal PI 3.14159
+var decimal E  2.71828
+
+job add a, b [
+    out a + b
+]
+
+job multiply a, b [
+    out a * b
+]
+
+job factorial n [
+    if n <= 1 [
+        out 1
+    ] else [
+        out n * (factorial n - 1)
+    ]
+]
+
+job fibonacci n [
+    if n <= 1 [
+        out n
+    ] else [
+        out (fibonacci n - 1) + (fibonacci n - 2)
+    ]
+]
