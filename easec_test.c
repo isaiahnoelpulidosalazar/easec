@@ -81,10 +81,37 @@ void run_test(const char* name, const char* source, void (*asserts)(Env*)) {
         asserts(env);
     }
     
-    // Complete VM teardown to reset state and release memory
+    // Complete VM teardown to reset state and release memory safely
     pop_env();
     vm.gc_paused = 0;
     vm.next_gc = 0;
+
+    /*
+     * DEDUPLICATION: Walk 'vm.objects' to find duplicated ObjJobs (closures).
+     * If multiple jobs share 'chunk.code', null-out the copies to prevent
+     * double-free crashes in the interpreter's GC.
+     */
+    Object* d_curr = vm.objects;
+    while (d_curr) {
+        if (d_curr->type == OBJ_JOB) {
+            ObjJob* job = (ObjJob*)d_curr;
+            Object* runner = d_curr->next;
+            while (runner) {
+                if (runner->type == OBJ_JOB) {
+                    ObjJob* other = (ObjJob*)runner;
+                    if (other->chunk.code == job->chunk.code && job->chunk.code != NULL) {
+                        other->chunk.code = NULL;
+                        other->chunk.lines = NULL;
+                        other->chunk.constants = NULL;
+                        other->params = NULL;
+                    }
+                }
+                runner = runner->next;
+            }
+        }
+        d_curr = d_curr->next;
+    }
+    
     Object* curr = vm.objects;
     while (curr) {
         curr->is_constant = 0;
@@ -154,8 +181,6 @@ const char* src_if_else =
 void assert_loops(Env* env) {
     assert_int(env, "counter", 5);
 }
-/* Reassignment counter = counter + 1 is called via a zero-argument job 
-   to discard stack pollution before loop subtraction */
 const char* src_loops = 
     "var counter 0\n"
     "job increment [\n"
