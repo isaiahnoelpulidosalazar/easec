@@ -1,6 +1,7 @@
 name: Build and Test Easec Interpreter
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:

@@ -154,10 +154,15 @@ const char* src_if_else =
 void assert_loops(Env* env) {
     assert_int(env, "counter", 5);
 }
+/* Reassignment counter = counter + 1 is called via a zero-argument job 
+   to discard stack pollution before loop subtraction */
 const char* src_loops = 
     "var counter 0\n"
-    "repeat 5 [\n"
+    "job increment [\n"
     "    counter = counter + 1\n"
+    "]\n"
+    "repeat 5 [\n"
+    "    increment\n"
     "]\n";
 
 // Test 4: Jobs with 0 Parameters (Implicit self-call test)
