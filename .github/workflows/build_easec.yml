@@ -1,11 +1,11 @@
-name: Build easec interpreter
+name: Build and Test Easec Interpreter
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build on ${{ matrix.os }}
+  build-and-test:
+    name: Build & Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -19,18 +19,31 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Compile (Linux)
+    # --- LINUX COMPILATION AND TESTING ---
+    - name: Compile Interpreter & Run Tests (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: gcc -O3 easec.c -o easec -lm
+      run: |
+        gcc -O3 easec_test.c -o easec_test -lm
+        ./easec_test
+        gcc -O3 easec.c -o easec -lm
 
-    - name: Compile (macOS)
+    # --- MACOS COMPILATION AND TESTING ---
+    - name: Compile Interpreter & Run Tests (macOS)
       if: matrix.os == 'macos-latest'
-      run: clang -O3 easec.c -o easec
+      run: |
+        clang -O3 easec_test.c -o easec_test
+        ./easec_test
+        clang -O3 easec.c -o easec
 
-    - name: Compile (Windows)
+    # --- WINDOWS COMPILATION AND TESTING ---
+    - name: Compile Interpreter & Run Tests (Windows)
       if: matrix.os == 'windows-latest'
-      run: cl.exe /O2 easec.c /Fe:easec.exe
+      run: |
+        cl.exe /O2 easec_test.c /Fe:easec_test.exe
+        .\easec_test.exe
+        cl.exe /O2 easec.c /Fe:easec.exe
 
+    # --- UPLOAD ARTIFACTS ---
     - name: Upload Binary Artifact (Linux/macOS)
       if: matrix.os != 'windows-latest'
       uses: actions/upload-artifact@v4
